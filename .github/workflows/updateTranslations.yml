@@ -1,0 +1,23 @@
+name: Update Translations
+
+on:
+  schedule:
+    - cron: "5 * * * *"
+env:
+  CROWDIN_API_TOKEN: ${{secrets.CROWDIN_API_TOKEN}}
+  MONGOIP: ${{secrets.MONGOIP}}
+  MONGOUSER: ${{secrets.MONGOUSER}}
+  MONGOPASS: ${{secrets.MONGOPASS}}
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v1
+      - name: Install Dependencies
+        run: npm i -g yarn && yarn
+      - name: Compile Project
+        run: tsc
+      - name: Update Translations
+        run: yarn updateLangs
