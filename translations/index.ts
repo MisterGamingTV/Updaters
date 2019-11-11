@@ -97,7 +97,7 @@ async function getLatestTranslations() {
   const res = (await base("export", {
     params: { key: process.env.CROWDIN_API_TOKEN, json: true }
   })).data;
-  if (!res.success || res.success.status !== "skipped") {
+  if (!res.success || res.success.status === "skipped") {
     core.info("Already up to date");
     process.exit();
   }
