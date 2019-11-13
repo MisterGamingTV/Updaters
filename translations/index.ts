@@ -94,9 +94,11 @@ async function getLatestTranslations() {
   //* If error or no new translations, exit
   //* Else download them
   //* Unzip them
-  const res = (await base("export", {
-    params: { key: process.env.CROWDIN_API_TOKEN, json: true }
-  })).data;
+  const res = (
+    await base("export", {
+      params: { key: process.env.CROWDIN_API_TOKEN, json: true }
+    })
+  ).data;
   if (!res.success || res.success.status === "skipped") {
     core.info("Already up to date");
     process.exit();
