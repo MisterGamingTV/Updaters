@@ -1,4 +1,4 @@
-name: Update Translations
+sname: Update Translations
 
 on:
   schedule:
