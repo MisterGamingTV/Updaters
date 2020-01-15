@@ -4,10 +4,16 @@ import {
   createWriteStream,
   createReadStream,
   readdirSync,
-  readFileSync
+  readFileSync,
+  writeFileSync
 } from "fs";
 import { MongoClient } from "mongodb";
 import * as core from "@actions/core";
+import * as Octokit from "@octokit/rest";
+import { basename } from "path";
+import { ensureDirSync } from "fs-extra";
+
+const octokit = new Octokit();
 
 try {
   require("dotenv").config({ path: "../.env" });
@@ -116,6 +122,50 @@ async function getLatestTranslations() {
   const extract = createReadStream("translations.zip").pipe(
     Extract({ path: "translations" })
   );
-  await new Promise(resolve => extract.once("end", resolve));
+  await new Promise(resolve => extract.once("finish", resolve));
+  await getSourceLanguage();
   core.info("Downloaded translations");
+}
+
+async function getSourceLanguage() {
+  const srcFolder = (
+    await octokit.repos.getContents({
+      owner: "PreMiD",
+      repo: "Strings",
+      path: "src/"
+    })
+  ).data
+    // @ts-ignore
+    .map(f => f.path);
+
+  await Promise.all(
+    srcFolder.map(async p => {
+      const projFolder = (
+        await octokit.repos.getContents({
+          owner: "PreMiD",
+          repo: "Strings",
+          path: p
+        })
+      ).data
+        // @ts-ignore
+        .map(f => f.path);
+
+      ensureDirSync(`translations/master/en/${basename(p)}`);
+
+      await Promise.all(
+        projFolder.map(async f => {
+          writeFileSync(
+            `translations/master/en/${basename(p)}/${basename(f)}`,
+            JSON.stringify(
+              (
+                await axios.get(
+                  `https://raw.githubusercontent.com/PreMiD/Strings/master/${f}`
+                )
+              ).data
+            )
+          );
+        })
+      );
+    })
+  );
 }
