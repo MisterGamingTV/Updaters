@@ -12,7 +12,7 @@ import * as core from "@actions/core";
 import * as Octokit from "@octokit/rest";
 import { basename } from "path";
 import { ensureDirSync } from "fs-extra";
-
+// @ts-ignore
 const octokit = new Octokit();
 
 try {
