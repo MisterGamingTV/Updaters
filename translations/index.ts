@@ -9,7 +9,7 @@ import {
 } from "fs";
 import { MongoClient } from "mongodb";
 import * as core from "@actions/core";
-import * as Octokit from "@octokit/rest";
+import Octokit from "@octokit/rest";
 import { basename } from "path";
 import { ensureDirSync } from "fs-extra";
 const octokit = new Octokit();
